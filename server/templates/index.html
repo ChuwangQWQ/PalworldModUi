@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>显示列表项</title>
+    <pre id="datas-1" style="display: none;">{{files}}</pre>
+    <pre id="datas-2" style="display: none;">{{error}}</pre>
+    <pre id="datas-3" style="display: none;">{{path}}</pre>
+    <style>
+        a {
+            color: aliceblue;
+            text-decoration: white;
+        }
+        .list-t {
+            background-color: #00cb1b;
+            padding: 20px;
+            display: block;
+            width: 80%;
+            height: 100%;
+            margin-top: 0%;
+            z-index: 0;
+            border: #4f5051 solid 2px;
+            border-radius: 22px;
+            transition: all 0.5s ease-in-out;
+        }
+        .list-t :hover {
+            background-color: rgb(95, 95, 95)
+        }
+        .list-f {
+            background-color: #e20000;
+            padding: 20px;
+            display: block;
+            width: 80%;
+            height: 100%;
+            margin-top: 0%;
+            z-index: 0;
+            border: #4f5051 solid 2px;
+            border-radius: 22px;
+            transition: all 0.5s ease-in-out;
+        }
+        .list-f :hover {
+            background-color: rgb(95, 95, 95)
+        }
+        body {
+            background-color: #3e4048;
+        }
+        h1, h4 {
+            color: azure;
+        }
+        button {
+            background-color: rgb(70, 70, 81);
+            box-shadow: 3px 3px 3px #6e6e6e;
+            border: 0px;
+            font-size: 20px;
+            padding-top: 6px;
+            padding-bottom: 6px;
+            padding-left: 10px;
+            padding-right: 10px;
+            align-items: center;
+            border-radius: 10px;
+            transition: all 0.5s;
+        }
+        button :hover {
+            background-color: rgb(95, 95, 95);
+        }
+    </style>
+</head>
+<body>
+    <h1>幻兽帕鲁模组管理器</h1>
+    <h4 id="ppaatthh">游戏文件路径:</h4>
+    <form action="">
+        <input type="text" name="path" id="gamepath">
+        <input type="submit">
+    </form>
+    <a href="?sc=helper">我不会？</a>
+    <div id="filelist">
+    </div>
+    <button><a href="?sc=sc">同步模组(上传)</a></button>
+    <button><a href="?sc=xz">同步模组(下载)</a></button>
+    <button><a href="?sc=download">下载模组前置(github源，需要加速器)</a></button>
+    <button><a href="?sc=f5">刷新Mod列表</a></button>
+    <script>
+        function strToObj(str) {
+            const result = {};
+            const pairs = str.split(',');
+        
+            pairs.forEach(pair => {
+                const [key, value] = pair.split(':');
+                result[key.trim()] = value.trim();
+            });
+        
+            return result;
+        }
+
+        function getParameterByName(name, url) {
+            if (!url) url = window.location.href;
+            name = name.replace(/[$$$$]/g, '\\$&');
+            var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, ' '));
+        }
+
+        const list = document.getElementById('filelist');
+        const dict = document.getElementById('datas-1').innerText;
+        const dict2 = strToObj(dict);
+
+        Object.entries(dict2).forEach(([key, value]) => {
+            if (value == 'true') {
+                list.innerHTML += '<div class="list-t"><a href="?type=false&mod=' + `${key}` + '">' + `${key}` + '</a></div><br>\n';
+            } else if (value == 'false') {
+                list.innerHTML += '<div class="list-f"><a href="?type=true&mod=' + `${key}` + '">' + `${key}` + '</a></div><br>\n';
+            }
+        });
+        const gamepath = document.getElementById('gamepath');
+        const error = document.getElementById('datas-2');
+        if (error.innerText == 'game path error') {
+            alert('游戏文件路径错误');
+        }
+        let gamepathvalue = document.getElementById('ppaatthh')
+        const gp = document.getElementById('datas-3');
+        gamepathvalue.innerText = '游戏文件路径:' + gp.innerText;
+        window.onload = function () {
+            mod = getParameterByName('mod')
+            if (mod != null) {
+                window.location.href = '?';
+                console.log(mod);
+            }
+        }
+    </script>
+</body>
+</html>
