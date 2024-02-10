@@ -63,12 +63,27 @@ def disableMod(Mod):
         f.write(json.dumps(data))
 
 def enableMod(Mod):
-    os.system(f'copy /y "{os.path.abspath("server\\allmods\\"+Mod)}" "{os.path.abspath("server\\embmods\\"+Mod)}"')
+    try:
+        shutil.copytree(os.path.abspath("server\\allmods\\"+Mod),os.path.abspath("server\\embmods\\"+Mod))
+    except:
+        try:
+            shutil.copy(os.path.abspath("server\\allmods\\"+Mod),os.path.abspath("server\\embmods\\"+Mod))
+        except:
+            pass
     with open("mods.json", "r") as f:
         data = json.load(f)
     data[Mod] = 'true'
     with open("mods.json", "w") as f:
         f.write(json.dumps(data))
+
+def enableAll():
+    for f in os.listdir(os.path.abspath('server\\allmods')):
+        print(f)
+        enableMod(f)
+
+def disableAll():
+    for f in os.listdir(os.path.abspath('server\\allmods')):
+        disableMod(f)
 
 def upMod():
     res(f'{getConfig()}\\Pal\Content\Paks')
@@ -107,6 +122,11 @@ def hello(request):
     path = request.GET.get('path')
     dicts = getMods()
     dicts = str(dicts).replace('{','').replace('}','').replace("'",'')
+    if mod != '' and mod != None:
+        if thing == 'true':
+            enableMod(mod)
+        elif thing == 'false':
+            disableMod(mod)
     if sc == 'helper':
         return render(request, "helper.html")
     elif sc == 'download':
@@ -129,13 +149,10 @@ def hello(request):
             return render(request, "index.html", {"files": dicts,"error":"game path error","path":getConfig()})
     elif sc == 'f5':
         f5()
-
-    if mod != '' and mod != None:
-        if thing == 'true':
-            enableMod(mod)
-        elif thing == 'false':
-            disableMod(mod)
-
+    elif sc == 'allOn':
+        enableAll()
+    elif sc == 'allOff':
+        disableAll()
     if not path == None and not path == '':
         try:
             if 'Palworld.exe' in os.listdir(path):

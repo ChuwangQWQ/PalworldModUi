@@ -80,6 +80,8 @@
     <button><a href="?sc=xz">同步模组(下载)</a></button>
     <button><a href="?sc=download">下载模组前置(github源，需要加速器)</a></button>
     <button><a href="?sc=f5">刷新Mod列表</a></button>
+    <button><a href="?sc=allOn">启用全部</a></button>
+    <button><a href="?sc=allOff">禁用全部</a></button>
     <script>
         function strToObj(str) {
             const result = {};
@@ -124,7 +126,9 @@
         gamepathvalue.innerText = '游戏文件路径:' + gp.innerText;
         window.onload = function () {
             mod = getParameterByName('mod')
-            if (mod != null) {
+            sc = getParameterByName('sc')
+            gamepath2 = getParameterByName('path')
+            if (mod != null || sc != null || gamepath2!= null) {
                 window.location.href = '?';
                 console.log(mod);
             }
