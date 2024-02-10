@@ -1,6 +1,0 @@
-安装说明 （Steam）
-您可以打开 Steam 并右键单击 PalWorld > 管理> 浏览本地文件
-在 Palworld\Pal\Binaries\Win64 中下载并解压缩UE4SS_Xinput.zip
-在Palworld\Pal\Binaries\Win64\Mods中下载并解压缩NoGrapplingGunTimer.zip
-返回 Palworld\Pal\Binaries\Win64
-编辑UE4SS-settings.ini并将bUseUObjectArrayCache = true设置为false

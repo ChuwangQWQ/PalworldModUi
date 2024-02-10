@@ -6,9 +6,9 @@ import configparser
 from time import sleep
 import json
 import shutil
+import uuid
 
 def copy_file(src, dst):
-    print(f"Copied {src} to {dst}")
     os.makedirs(os.path.dirname(dst), exist_ok=True)
     shutil.copy2(src, dst)
 
@@ -42,11 +42,12 @@ def getConfig():
 
 def res(directory):
     for f in walks(directory):
-        if f != 'Pal-Windows.pak':
+        if os.path.basename(f) != 'Pal-Windows.pak':
             os.remove(f)
     if directory== f'{getConfig()}\\Pal\Content\Paks':
         try:
-            os.rmdir(directory)
+            print('====================')
+            os.removedirs(directory)
         except:
             pass
 
@@ -90,12 +91,18 @@ def upMod():
     res(f'{getConfig()}\\Pal\Binaries\Win64\Mods')
     mods = walks(os.path.abspath('server\\allmods'))
     for f in mods:
-        a, b = os.path.splitext(f)
-        if b == '.lua' or b == '.txt':
-            copy_file(f, f'{getConfig()}\\Pal\\Binaries\\Win64\\Mods\\{f.replace(os.path.abspath("server\\allmods"), "")}')
-        else:
-            copy_file(f, f'{getConfig()}\\Pal\\Binaries\\Win64\\Mods\\{f.replace(os.path.abspath("server\\allmods"), "")}')
-            copy_file(f, f'{getConfig()}\\Pal\Content\Paks\\{f.replace(os.path.abspath("server\\allmods"), "")}')
+        copy_file(f, f'{getConfig()}\\Pal\\Binaries\\Win64\\Mods\\{f.replace(os.path.abspath("server\\allmods"), "")}')
+        copy_file(f, f'{getConfig()}\\Pal\Content\Paks\\{f.replace(os.path.abspath("server\\allmods"), "")}')
+    for f in os.listdir(f'{getConfig()}\\Pal\\Binaries\\Win64\\Mods'):
+        if os.path.isdir(f'{getConfig()}\\Pal\\Binaries\\Win64\\Mods\\{f}'):
+            os.system(f'ren "{getConfig()}\\Pal\\Binaries\\Win64\\Mods\\{f.replace(os.path.abspath("server\\allmods"), "")}" "{uuid.uuid4()}"')
+        elif f.endswith('.pak'):
+            os.system(f'ren "{getConfig()}\\Pal\Content\Paks\\{f.replace(os.path.abspath("server\\allmods"), "")}" "{uuid.uuid4()}.pak"')
+    for f in os.listdir(f'{getConfig()}\\Pal\Content\Paks'):
+        if os.path.isdir(f'{getConfig()}\\Pal\Content\Paks\\{f}'):
+            os.system(f'ren "{getConfig()}\\Pal\Content\Paks\\{f.replace(os.path.abspath("server\\allmods"), "")}" "{uuid.uuid4()}"')
+        elif f.endswith('.pak'):
+            os.system(f'ren "{getConfig()}\\Pal\Content\Paks\\{f.replace(os.path.abspath("server\\allmods"), "")}" "{uuid.uuid4()}.pak"')
 
 def downloadMod():
     files = walks(f'{getConfig()}\\Pal\Binaries\Win64\Mods')
