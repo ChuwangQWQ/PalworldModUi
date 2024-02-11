@@ -8,6 +8,10 @@ import json
 import shutil
 import uuid
 
+def getEndName(file):
+    _, file_extension = os.path.splitext(file)
+    return file_extension
+
 def copy_file(src, dst):
     os.makedirs(os.path.dirname(dst), exist_ok=True)
     shutil.copy2(src, dst)
@@ -41,15 +45,15 @@ def getConfig():
         pass
 
 def res(directory):
-    for f in walks(directory):
-        if os.path.basename(f) != 'Pal-Windows.pak':
-            os.remove(f)
-    if directory== f'{getConfig()}\\Pal\Content\Paks':
-        try:
-            print('====================')
-            os.removedirs(directory)
-        except:
-            pass
+    if directory != f'{getConfig()}\\Pal\Content\Paks':
+        shutil.rmtree(directory, ignore_errors=True)
+    else:
+        for f in os.listdir(directory):
+            if os.path.isdir(f):
+                res(f)
+            else:
+                if os.path.basename(f) != 'Pal-Windows.pak':
+                    os.system(f'del /q {getConfig()}\\Pal\Content\Paks\\{f}')
 
 def getMods():
     with open("mods.json", "r") as f:
@@ -87,30 +91,35 @@ def disableAll():
         disableMod(f)
 
 def upMod():
-    res(f'{getConfig()}\\Pal\Content\Paks')
-    res(f'{getConfig()}\\Pal\Binaries\Win64\Mods')
+    res(f'{getConfig()}\\Pal\\Content\\Paks')
+    res(f'{getConfig()}\\Pal\\Binaries\\Win64\\Mods')
     mods = walks(os.path.abspath('server\\allmods'))
     for f in mods:
         copy_file(f, f'{getConfig()}\\Pal\\Binaries\\Win64\\Mods\\{f.replace(os.path.abspath("server\\allmods"), "")}')
         copy_file(f, f'{getConfig()}\\Pal\Content\Paks\\{f.replace(os.path.abspath("server\\allmods"), "")}')
     for f in os.listdir(f'{getConfig()}\\Pal\\Binaries\\Win64\\Mods'):
-        if os.path.isdir(f'{getConfig()}\\Pal\\Binaries\\Win64\\Mods\\{f}'):
-            os.system(f'ren "{getConfig()}\\Pal\\Binaries\\Win64\\Mods\\{f.replace(os.path.abspath("server\\allmods"), "")}" "{uuid.uuid4()}"')
-        elif f.endswith('.pak'):
-            os.system(f'ren "{getConfig()}\\Pal\Content\Paks\\{f.replace(os.path.abspath("server\\allmods"), "")}" "{uuid.uuid4()}.pak"')
-    for f in os.listdir(f'{getConfig()}\\Pal\Content\Paks'):
-        if os.path.isdir(f'{getConfig()}\\Pal\Content\Paks\\{f}'):
-            os.system(f'ren "{getConfig()}\\Pal\Content\Paks\\{f.replace(os.path.abspath("server\\allmods"), "")}" "{uuid.uuid4()}"')
-        elif f.endswith('.pak'):
-            os.system(f'ren "{getConfig()}\\Pal\Content\Paks\\{f.replace(os.path.abspath("server\\allmods"), "")}" "{uuid.uuid4()}.pak"')
+        dir = f'{getConfig()}\\Pal\\Binaries\\Win64\\Mods\\{f}'
+        if getEndName(f) == '':
+            print(f"???????ren '{dir}' '{uuid.uuid4()}'")
+            os.system(f'ren "{dir}" "{uuid.uuid4()}"')
+        elif getEndName(f) == '.pak':
+            print(f"???????ren '{dir}' '{uuid.uuid4()}.pak'")
+            os.system(f'ren "{dir}" "{uuid.uuid4()}.pak"')
+    for f in os.listdir(f'{getConfig()}\\Pal\\Content\\Paks'):
+        dir = f'{getConfig()}\\Pal\\Content\\Paks\\{f}'
+        if getEndName(f) == '':
+            os.system(f'ren "{dir}" "{uuid.uuid4()}"')
+        elif getEndName(f) == '.pak':
+            if f != 'Pal-Windows.pak':
+                os.system(f'ren "{dir}" "{uuid.uuid4()}.pak"')
 
 def downloadMod():
-    files = walks(f'{getConfig()}\\Pal\Binaries\Win64\Mods')
+    files = walks(f'{getConfig()}\\Pal\\Binaries\\Win64\\Mods')
     files2 = []
     for f in range(len(files)):
         q = files[f-1].replace(getConfig()+'\\Pal\\Binaries\\Win64\Mods', '')
         files2.append(os.path.abspath(f'server\\allmods{q}'))
-    packs = walks(f'{getConfig()}\\Pal\Content\Paks\Mods')
+    packs = walks(f'{getConfig()}\\Pal\\Content\\Paks\\Mods')
     packs2 = []
     for f in range(len(packs)):
         q = packs[f-1].replace(getConfig()+'\\Pal\\Content\\Paks\\Mods', '')
@@ -143,11 +152,11 @@ def hello(request):
         except:
             return render(request, "index.html", {"files": dicts,"error":"game path error","path":getConfig()})
     elif sc == 'sc':
-        try:
+        # try:
             upMod()
             return render(request, "index.html", {"files": dicts,"path":getConfig(),"error":"Done!"})
-        except:
-            return render(request, "index.html", {"files": dicts,"error":"game path error","path":getConfig()})
+        # except:
+        #     return render(request, "index.html", {"files": dicts,"error":"game path error","path":getConfig()})
     elif sc == 'xz':
         try:
             downloadMod()
